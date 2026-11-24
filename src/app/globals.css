@@ -1,0 +1,116 @@
+@import "tailwindcss";
+
+:root {
+  /* Brand */
+  --forest-ink: #182b25;
+  --warm-cream: #f4ead9;
+  --muted-gold: #d9b77d;
+  --sage: #a7c5b6;
+  --charcoal: #171a22;
+  --slate: #344b60;
+  --paper: #faf7f0;
+  --action-green: #2f5946;
+  --action-green-hover: #264839;
+  --danger: #8b3a3a;
+  --border-soft: color-mix(in srgb, var(--forest-ink) 12%, transparent);
+  --shadow-soft: 0 12px 40px color-mix(in srgb, var(--forest-ink) 8%, transparent);
+
+  /* Collection themes */
+  --theme-baker: #85492d;
+  --theme-bookworm: #663b48;
+  --theme-photographer: #344b60;
+
+  /* Rarity */
+  --rarity-bronze: #a67c52;
+  --rarity-silver: #8a93a0;
+  --rarity-gold: #c4a15a;
+  --rarity-platinum: #7f93a8;
+  --rarity-legendary: #9a6b3f;
+
+  /* Surfaces */
+  --background: var(--paper);
+  --foreground: var(--forest-ink);
+  --surface: #fffdf8;
+  --surface-muted: var(--warm-cream);
+  --focus-ring: color-mix(in srgb, var(--action-green) 55%, white);
+
+  /* Motion */
+  --motion-fast: 160ms;
+  --motion-complete: 250ms;
+  --motion-unlock: 650ms;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-forest-ink: var(--forest-ink);
+  --color-warm-cream: var(--warm-cream);
+  --color-muted-gold: var(--muted-gold);
+  --color-sage: var(--sage);
+  --color-charcoal: var(--charcoal);
+  --color-slate: var(--slate);
+  --color-paper: var(--paper);
+  --color-action-green: var(--action-green);
+  --color-action-green-hover: var(--action-green-hover);
+  --color-danger: var(--danger);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-border-soft: var(--border-soft);
+  --color-theme-baker: var(--theme-baker);
+  --color-theme-bookworm: var(--theme-bookworm);
+  --color-theme-photographer: var(--theme-photographer);
+  --color-rarity-bronze: var(--rarity-bronze);
+  --color-rarity-silver: var(--rarity-silver);
+  --color-rarity-gold: var(--rarity-gold);
+  --color-rarity-platinum: var(--rarity-platinum);
+  --color-rarity-legendary: var(--rarity-legendary);
+  --font-sans: var(--font-lato);
+  --font-display: var(--font-eb-garamond);
+  --radius-control: 12px;
+  --radius-card: 16px;
+  --radius-hero: 24px;
+  --shadow-soft: var(--shadow-soft);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-lato), system-ui, sans-serif;
+  min-height: 100%;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--sage) 55%, white);
+  color: var(--forest-ink);
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+.font-display {
+  font-family: var(--font-eb-garamond), Georgia, serif;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
