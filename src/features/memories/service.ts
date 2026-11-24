@@ -26,6 +26,7 @@ export type Memory = {
   title: string;
   note: string | null;
   date: LocalDate;
+  imagePath: string | null;
   source: MemorySource;
   xp: number;
 };
@@ -47,12 +48,13 @@ type MemoryRow = {
   achievement_description: string | null;
   achievement_rarity: string | null;
   achievement_motif: string | null;
+  image_path: string | null;
 };
 
 // Every query below is filtered by m.user_id: a memory is only ever readable
 // or writable by the user who owns it.
 const MEMORY_SELECT = `
-  select m.id, m.title, m.note, m.occurred_on::text as date, m.source_type,
+  select m.id, m.title, m.note, m.occurred_on::text as date, m.source_type, m.image_path,
          coalesce(x.amount, 0)::int as xp,
          e.category as experience_category, e.prompt as experience_prompt,
          c.completion_method,
@@ -90,7 +92,15 @@ function toMemory(row: MemoryRow): Memory {
           motif: row.achievement_motif ?? "",
           theme: row.collection_theme ?? "",
         };
-  return { id: row.id, title: row.title, note: row.note, date: row.date, source, xp: row.xp };
+  return {
+    id: row.id,
+    title: row.title,
+    note: row.note,
+    date: row.date,
+    imagePath: row.image_path,
+    source,
+    xp: row.xp,
+  };
 }
 
 /** Most recent first. */
@@ -145,6 +155,30 @@ export async function updateMemoryNote(
      where id = $1 and user_id = $2
      returning id`,
     [memoryId, userId, cleaned],
+  );
+  return rows.length > 0;
+}
+
+const TITLE_MAX = 120;
+
+export async function updateMemory(
+  db: Db,
+  userId: string,
+  memoryId: string,
+  input: { title: string; note: string | null; date: LocalDate; imagePath?: string | null },
+): Promise<boolean> {
+  const title = input.title.trim().slice(0, TITLE_MAX);
+  if (!title) return false;
+  const rows = await db.query(
+    `update memory_entries
+     set title = $3,
+         note = $4,
+         occurred_on = $5::date,
+         image_path = case when $6::text is null then image_path else $6 end,
+         updated_at = now()
+     where id = $1 and user_id = $2
+     returning id`,
+    [memoryId, userId, title, input.note, input.date, input.imagePath ?? null],
   );
   return rows.length > 0;
 }

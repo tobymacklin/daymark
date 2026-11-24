@@ -263,7 +263,7 @@ export async function recordCompletion(
 }
 
 export type CompleteTodayResult =
-  | ({ ok: true } & CompletionOutcome)
+  | ({ ok: true; slug: string } & CompletionOutcome)
   | { ok: false; reason: "nothing_scheduled" | "no_alternative" };
 
 /** Completes the experience scheduled for the user's current local date. */
@@ -287,5 +287,5 @@ export async function completeToday(
     method,
     completedAt: now,
   });
-  return { ok: true, ...outcome };
+  return { ok: true, slug: experience.slug, ...outcome };
 }

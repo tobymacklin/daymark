@@ -1,16 +1,13 @@
 import Link from "next/link";
-import { MemoryCard } from "@/components/memories/memory-card";
+import { JournalList } from "@/components/memories/journal-list";
 import { MonthCalendar } from "@/components/memories/month-calendar";
-import {
-  countMemories,
-  getMemoryDatesInMonth,
-  listMemories,
-} from "@/features/memories/service";
 import { countDueReviews } from "@/features/recall/service";
+import { getMemoryDatesInMonth, listMemories } from "@/features/memories/service";
 import { requireUser } from "@/lib/authentication/current-user";
 import { getDb } from "@/lib/database";
-import { localDateInTimezone, yearMonthOf } from "@/lib/dates";
+import { formatMonth, localDateInTimezone, yearMonthOf } from "@/lib/dates";
 
+export const instant = false;
 export const metadata = { title: "Memories" };
 
 export default async function MemoriesPage() {
@@ -18,54 +15,48 @@ export default async function MemoriesPage() {
   const db = await getDb();
   const today = localDateInTimezone(new Date(), user.timezone);
   const month = yearMonthOf(today);
-  const [memories, markedDates, total, dueCount] = await Promise.all([
+  const [memories, markedDates, dueCount] = await Promise.all([
     listMemories(db, user.id),
     getMemoryDatesInMonth(db, user.id, month),
-    countMemories(db, user.id),
     countDueReviews(db, user.id, today),
   ]);
 
   return (
-    <div className="space-y-6">
-      <header className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <p className="text-xs uppercase tracking-[0.16em] text-forest-ink/50">Remember</p>
-          <h1 className="mt-2 font-display text-4xl leading-tight">Your memories</h1>
-          <p className="mt-2 text-sm text-forest-ink/65">
-            {total} {total === 1 ? "moment" : "moments"} · private by default
-          </p>
-        </div>
-        {dueCount > 0 ? (
-          <Link
-            href="/memories/recall"
-            className="rounded-full bg-slate px-4 py-2 text-sm text-warm-cream"
-          >
-            {dueCount} recall{dueCount === 1 ? "" : "s"} ready
-          </Link>
-        ) : (
-          <Link
-            href="/memories/recall"
-            className="text-sm text-action-green underline-offset-4 hover:underline"
-          >
-            Try a memory recall
-          </Link>
-        )}
-      </header>
+    <div>
+      <h1 className="font-display text-[1.75rem] font-semibold tracking-tight">Memories</h1>
+      <p className="mt-1 text-[1.0625rem] text-ink-soft">The moments that make up your life.</p>
 
-      <MonthCalendar month={month} markedDates={markedDates} today={today} />
-
-      <section className="space-y-3">
-        <h2 className="text-xs uppercase tracking-[0.16em] text-forest-ink/50">
-          Recent moments
+      <section className="mt-4 rounded-2xl bg-sage px-4 py-4">
+        <h2 className="font-display text-[1.25rem] font-semibold">
+          {dueCount > 0 ? "Remember last week?" : "Look back on a moment"}
         </h2>
-        {memories.length === 0 ? (
-          <p className="rounded-[var(--radius-card)] bg-warm-cream px-4 py-5 text-sm text-forest-ink/70">
-            Complete today’s experience or unlock an achievement to start your archive.
-          </p>
-        ) : (
-          memories.map((memory) => <MemoryCard key={memory.id} memory={memory} />)
-        )}
+        <p className="mt-1 text-[1.0625rem] leading-7">
+          {dueCount > 0
+            ? "Take a moment to revisit your experiences."
+            : "Nothing is waiting right now. You can still open recall whenever you like."}
+        </p>
+        <Link
+          href="/memories/recall"
+          className="mt-3 flex min-h-12 items-center justify-center rounded-xl bg-action-green px-4 text-[1.0625rem] font-semibold text-white"
+        >
+          Start memory recall
+        </Link>
       </section>
+
+      <div className="mt-6 flex items-baseline justify-between">
+        <h2 className="font-display text-[1.35rem] font-semibold">{formatMonth(month)}</h2>
+      </div>
+
+      <JournalList memories={memories} />
+
+      <details className="mt-8 rounded-2xl bg-white px-4 py-3">
+        <summary className="min-h-12 cursor-pointer list-none text-[1.0625rem] font-semibold [&::-webkit-details-marker]:hidden">
+          Calendar
+        </summary>
+        <div className="pb-2">
+          <MonthCalendar month={month} markedDates={markedDates} today={today} />
+        </div>
+      </details>
     </div>
   );
 }

@@ -4,7 +4,7 @@ type Variant = "primary" | "secondary" | "ghost" | "danger";
 
 const VARIANT: Record<Variant, string> = {
   primary:
-    "bg-action-green text-warm-cream hover:bg-action-green-hover disabled:opacity-50",
+    "bg-action-green text-white hover:bg-action-green-hover disabled:opacity-50",
   secondary:
     "bg-surface text-forest-ink border border-border-soft hover:bg-warm-cream disabled:opacity-50",
   ghost: "bg-transparent text-forest-ink hover:bg-warm-cream/70 disabled:opacity-50",
@@ -26,7 +26,7 @@ export function Button({
   return (
     <button
       type={type}
-      className={`inline-flex min-h-11 items-center justify-center rounded-[var(--radius-control)] px-5 text-[15px] font-medium transition-colors duration-[var(--motion-fast)] ${VARIANT[variant]} ${className}`}
+      className={`inline-flex min-h-12 items-center justify-center rounded-[var(--radius-control)] px-5 text-[17px] font-semibold transition-colors duration-[var(--motion-fast)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action-green focus-visible:ring-offset-2 ${VARIANT[variant]} ${className}`}
       {...props}
     >
       {children}

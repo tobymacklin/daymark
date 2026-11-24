@@ -23,13 +23,10 @@ export default async function RecallPage() {
       {review ? (
         <RecallPanel review={review} hints={hints} />
       ) : (
-        <section className="rounded-[var(--radius-card)] bg-slate px-5 py-8 text-warm-cream">
-          <p className="text-xs uppercase tracking-[0.16em] text-sage">Your week in moments</p>
-          <h1 className="mt-3 font-display text-3xl leading-tight">Nothing due right now.</h1>
-          <p className="mt-3 max-w-md text-sm leading-6 text-warm-cream/75">
-            After you complete experiences, gentle recall questions appear a few
-            days later. There is no penalty for forgetting — only a chance to
-            revisit what you did.
+        <section className="rounded-2xl bg-sage px-5 py-6">
+          <h1 className="font-display text-[1.75rem] font-semibold leading-tight">Nothing is waiting.</h1>
+          <p className="mt-2 max-w-md text-[1.0625rem] leading-7">
+            After you keep an experience, a gentle question appears a few days later. There is no timer and no penalty for setting it aside.
           </p>
         </section>
       )}

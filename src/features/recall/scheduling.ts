@@ -36,19 +36,36 @@ export function nextIntervalDays(currentInterval: number, result: RecallResult):
   return shorter ?? SHORTEST_INTERVAL_DAYS;
 }
 
-/** Phrases the recall question by how long ago the memory happened. */
-export function recallQuestion(memoryDate: LocalDate, today: LocalDate): string {
+function whenPhrase(memoryDate: LocalDate, today: LocalDate): string {
   const age = diffDays(memoryDate, today);
   const weekday = weekdayName(memoryDate);
-
-  if (age === 0) return "What did you do today?";
-  if (age === 1) return "What did you do yesterday?";
-  if (age < 7) return `What did you do this past ${weekday}?`;
-  if (age < 14) return `What did you do last ${weekday}?`;
-
+  if (age === 0) return "today";
+  if (age === 1) return "yesterday";
+  if (age < 7) return `this past ${weekday}`;
+  if (age < 14) return `last ${weekday}`;
   const sameYear = memoryDate.slice(0, 4) === today.slice(0, 4);
   const day = `${weekday} ${dayOfMonth(memoryDate)} ${monthName(memoryDate)}`;
-  return sameYear
-    ? `What did you do on ${day}?`
-    : `What did you do on ${day} ${memoryDate.slice(0, 4)}?`;
+  return sameYear ? day : `${day} ${memoryDate.slice(0, 4)}`;
+}
+
+/**
+ * Phrases the recall question by how long ago the memory happened.
+ * A saved detail, such as a song or an object, can be the thing asked about.
+ * There is still no timer and no score.
+ */
+export function recallQuestion(memoryDate: LocalDate, today: LocalDate, focus?: string | null): string {
+  const when = whenPhrase(memoryDate, today);
+  if (focus === "Song") return `Which song do you remember from ${when}?`;
+  if (focus === "Person") return `Who do you remember from ${when}?`;
+  if (focus === "Place") return `Which place do you remember from ${when}?`;
+  if (focus === "Animal") return `Which animal do you remember from ${when}?`;
+  if (focus === "Language") return `Which language do you remember from ${when}?`;
+  if (focus === "Object" || focus === "What you found") return `What did you find ${when}?`;
+  if (!focus) {
+    if (when === "today" || when === "yesterday" || when.startsWith("this past") || when.startsWith("last ")) {
+      return `What did you do ${when}?`;
+    }
+    return `What did you do on ${when}?`;
+  }
+  return `What do you remember from ${when}?`;
 }

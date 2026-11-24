@@ -12,11 +12,22 @@ export const LEVEL_TITLES: ReadonlyArray<{ level: number; title: string }> = [
   { level: 5, title: "Discoverer" },
   { level: 10, title: "Explorer" },
   { level: 20, title: "Adventurer" },
-  { level: 35, title: "Experience Collector" },
   { level: 50, title: "Wayfinder" },
-  { level: 75, title: "Life Explorer" },
-  { level: 100, title: "Master of Moments" },
+  { level: 100, title: "Life Explorer" },
 ];
+
+export const RANK_COLORS: Record<string, { face: string; mark: string }> = {
+  Curious: { face: "#DDE9DF", mark: "#294F40" },
+  Discoverer: { face: "#E3EEF5", mark: "#527A99" },
+  Explorer: { face: "#F6E7C8", mark: "#C4923E" },
+  Adventurer: { face: "#F6E4DC", mark: "#B86C50" },
+  Wayfinder: { face: "#EBE6F2", mark: "#83749B" },
+  "Life Explorer": { face: "#F8EFDC", mark: "#A9782E" },
+};
+
+export function rankColors(title: string): { face: string; mark: string } {
+  return RANK_COLORS[title] ?? RANK_COLORS.Curious;
+}
 
 export function xpForLevel(level: number): number {
   const steps = Math.max(0, Math.floor(level) - 1);

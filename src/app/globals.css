@@ -1,16 +1,20 @@
 @import "tailwindcss";
 
 :root {
-  /* Brand */
-  --forest-ink: #182b25;
-  --warm-cream: #f4ead9;
-  --muted-gold: #d9b77d;
-  --sage: #a7c5b6;
-  --charcoal: #171a22;
-  --slate: #344b60;
-  --paper: #faf7f0;
-  --action-green: #2f5946;
-  --action-green-hover: #264839;
+  /* Brand — approved November 2026 palette */
+  --forest-ink: #202b25;
+  --ink-soft: #3e4c44;
+  --warm-cream: #f7f5ef;
+  --muted-gold: #e9b66b;
+  --sage: #dde9df;
+  --charcoal: #202b25;
+  --slate: #527a99;
+  --paper: #f7f5ef;
+  --action-green: #294f40;
+  --action-green-hover: #1f3d32;
+  --discovery: #527a99;
+  --creativity: #b86c50;
+  --reflection: #83749b;
   --danger: #8b3a3a;
   --border-soft: color-mix(in srgb, var(--forest-ink) 12%, transparent);
   --shadow-soft: 0 12px 40px color-mix(in srgb, var(--forest-ink) 8%, transparent);
@@ -52,6 +56,10 @@
   --color-paper: var(--paper);
   --color-action-green: var(--action-green);
   --color-action-green-hover: var(--action-green-hover);
+  --color-ink-soft: var(--ink-soft);
+  --color-discovery: var(--discovery);
+  --color-creativity: var(--creativity);
+  --color-reflection: var(--reflection);
   --color-danger: var(--danger);
   --color-surface: var(--surface);
   --color-surface-muted: var(--surface-muted);
@@ -64,8 +72,9 @@
   --color-rarity-gold: var(--rarity-gold);
   --color-rarity-platinum: var(--rarity-platinum);
   --color-rarity-legendary: var(--rarity-legendary);
-  --font-sans: var(--font-lato);
-  --font-display: var(--font-eb-garamond);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-manrope);
+  --font-serif: var(--font-lora);
   --radius-control: 12px;
   --radius-card: 16px;
   --radius-hero: 24px;
@@ -83,8 +92,14 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-lato), system-ui, sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.5;
   min-height: 100%;
+}
+
+.font-quote {
+  font-family: var(--font-lora), Georgia, serif;
 }
 
 ::selection {
@@ -108,9 +123,53 @@ body {
 }
 
 .font-display {
-  font-family: var(--font-eb-garamond), Georgia, serif;
+  font-family: var(--font-manrope), var(--font-display), sans-serif;
 }
 
 .tabular {
   font-variant-numeric: tabular-nums;
+}
+
+@keyframes xp-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes check-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes bar-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.xp-rise {
+  animation: xp-rise 560ms ease;
+}
+
+.check-pop {
+  animation: check-pop 420ms ease;
+}
+
+.bar-fill {
+  transform-origin: left center;
+  animation: bar-fill 700ms ease;
 }

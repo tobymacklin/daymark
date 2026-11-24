@@ -48,7 +48,7 @@ export function RecallPanel({ review, hints }: RecallPanelProps) {
         <p className="mt-2 font-display text-2xl">{outcome.revealed.title}</p>
         <p className="mt-3 text-sm leading-6 text-warm-cream/85">{outcome.revealed.prompt}</p>
         {outcome.revealed.note ? (
-          <p className="mt-4 rounded-[var(--radius-control)] bg-white/10 px-3 py-2 text-sm">
+          <p className="mt-4 whitespace-pre-line rounded-[var(--radius-control)] bg-white/10 px-3 py-2 text-sm leading-6">
             {outcome.revealed.note}
           </p>
         ) : null}

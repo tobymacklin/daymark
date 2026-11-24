@@ -87,6 +87,36 @@ function toCollection(row: CollectionRow): CollectionSummary {
   };
 }
 
+export async function listRecentUnlocks(
+  db: Db,
+  userId: string,
+  limit = 8,
+): Promise<Array<{ slug: string; title: string; collectionSlug: string; rarity: Rarity; xp: number }>> {
+  const rows = await db.query<{
+    slug: string;
+    title: string;
+    collection_slug: string;
+    rarity: Rarity;
+    xp_reward: number;
+  }>(
+    `select a.slug, a.title, c.slug as collection_slug, a.rarity, a.xp_reward
+     from user_achievements ua
+     join achievements a on a.id = ua.achievement_id
+     join hobby_collections c on c.id = a.collection_id
+     where ua.user_id = $1
+     order by ua.unlocked_at desc
+     limit $2`,
+    [userId, limit],
+  );
+  return rows.map((row) => ({
+    slug: row.slug,
+    title: row.title,
+    collectionSlug: row.collection_slug,
+    rarity: row.rarity,
+    xp: row.xp_reward,
+  }));
+}
+
 export async function listCollections(db: Db, userId: string): Promise<CollectionSummary[]> {
   const rows = await db.query<CollectionRow>(`${COLLECTION_SELECT} group by c.id order by c.sort_order`, [
     userId,

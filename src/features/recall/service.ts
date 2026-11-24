@@ -1,5 +1,6 @@
 import { addDays, type LocalDate } from "@/lib/dates";
 import type { Db, Queryable } from "@/lib/database/types";
+import { askLabel, noteHasLabel } from "@/features/daily/memory-prompts";
 import {
   FIRST_INTERVAL_DAYS,
   nextIntervalDays,
@@ -46,21 +47,25 @@ export async function scheduleFirstReview(
 
 /** The oldest review that is due, if any. */
 export async function getDueReview(db: Db, userId: string, today: LocalDate): Promise<DueReview | null> {
-  const [row] = await db.query<{ id: string; memory_id: string; memory_date: string }>(
-    `select r.id, m.id as memory_id, m.occurred_on::text as memory_date
+  const [row] = await db.query<{ id: string; memory_id: string; memory_date: string; note: string | null; slug: string | null }>(
+    `select r.id, m.id as memory_id, m.occurred_on::text as memory_date, m.note, e.slug
      from memory_reviews r
      join memory_entries m on m.id = r.memory_entry_id
+     left join user_experience_completions c
+       on c.id = m.source_id and m.source_type = 'daily_experience'
+     left join experiences e on e.id = c.experience_id
      where r.user_id = $1 and r.completed_at is null and r.due_on <= $2::date
      order by r.due_on, m.occurred_on
      limit 1`,
     [userId, today],
   );
   if (!row) return null;
+  const focus = row.slug ? askLabel(row.slug) : null;
   return {
     id: row.id,
     memoryId: row.memory_id,
     memoryDate: row.memory_date,
-    question: recallQuestion(row.memory_date, today),
+    question: recallQuestion(row.memory_date, today, focus && noteHasLabel(row.note, focus) ? focus : null),
   };
 }
 

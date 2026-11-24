@@ -1,17 +1,23 @@
 import type { Metadata, Viewport } from "next";
-import { EB_Garamond, Lato } from "next/font/google";
+import { Inter, Lora, Manrope } from "next/font/google";
 import "./globals.css";
 
-const ebGaramond = EB_Garamond({
-  variable: "--font-eb-garamond",
+const manrope = Manrope({
+  variable: "--font-manrope",
   subsets: ["latin"],
   display: "swap",
 });
 
-const lato = Lato({
-  variable: "--font-lato",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["400", "700"],
+  display: "swap",
+});
+
+const lora = Lora({
+  variable: "--font-lora",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 
@@ -20,12 +26,12 @@ export const metadata: Metadata = {
     default: "Daymark",
     template: "%s · Daymark",
   },
-  description: "Make today different enough to remember.",
+  description: "Make every day worth remembering.",
   applicationName: "Daymark",
 };
 
 export const viewport: Viewport = {
-  themeColor: "#FAF7F0",
+  themeColor: "#F7F5EF",
   width: "device-width",
   initialScale: 1,
 };
@@ -35,7 +41,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className={`${ebGaramond.variable} ${lato.variable} h-full antialiased`}
+      className={`${manrope.variable} ${inter.variable} ${lora.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans">{children}</body>
     </html>

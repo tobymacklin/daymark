@@ -4,42 +4,49 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const TABS = [
-  { href: "/today", label: "Today" },
-  { href: "/achieve", label: "Achieve" },
-  { href: "/memories", label: "Memories" },
-  { href: "/profile", label: "Profile" },
+  { href: "/today", label: "Today", hint: "Daily experience" },
+  { href: "/achieve", label: "Explore", hint: "Hobbies and achievements" },
+  { href: "/memories", label: "Memories", hint: "Journal and recall" },
+  { href: "/profile", label: "You", hint: "Personal progress" },
 ] as const;
 
 function TabIcon({ href }: { href: (typeof TABS)[number]["href"] }) {
-  const common = { fill: "none", stroke: "currentColor", strokeWidth: 1.6, strokeLinecap: "round" as const };
+  const common = {
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.75,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+  };
   if (href === "/today") {
     return (
       <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden>
-        <path d="M4 15.5c3.2-2.4 6.6-3.6 8-3.6s4.8 1.2 8 3.6" {...common} />
-        <circle cx="12" cy="8.5" r="1.6" fill="currentColor" stroke="none" />
+        <circle cx="12" cy="12" r="3.25" {...common} />
+        <path d="M12 3.5v1.8M12 18.7v1.8M3.5 12h1.8M18.7 12h1.8M6 6l1.3 1.3M16.7 16.7 18 18M18 6l-1.3 1.3M7.3 16.7 6 18" {...common} />
       </svg>
     );
   }
   if (href === "/achieve") {
     return (
       <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden>
-        <circle cx="12" cy="10" r="5.5" {...common} />
-        <path d="M9 15.2 8 20l4-1.6L16 20l-1-4.8" {...common} />
+        <circle cx="12" cy="12" r="7.25" {...common} />
+        <circle cx="12" cy="12" r="2" {...common} />
+        <path d="M12 4.75v2.2M16.2 7.2l-1.2 1.6" {...common} />
       </svg>
     );
   }
   if (href === "/memories") {
     return (
       <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden>
-        <path d="M7 5.5h8.5L19 9v9.5H7z" {...common} />
-        <path d="M15.5 5.5V9H19" {...common} />
+        <path d="M7 5.5h7.2L18 9.2V18.5H7z" {...common} />
+        <path d="M14.2 5.6V9H18M9.5 12.5h5.5M9.5 15.5h4" {...common} />
       </svg>
     );
   }
   return (
     <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden>
       <circle cx="12" cy="9" r="3" {...common} />
-      <path d="M6.5 18.5c1.2-2.4 3-3.6 5.5-3.6s4.3 1.2 5.5 3.6" {...common} />
+      <path d="M6.5 18.5c1.1-2.5 2.9-3.7 5.5-3.7s4.4 1.2 5.5 3.7" {...common} />
     </svg>
   );
 }
@@ -53,8 +60,8 @@ export function TabNav({ orientation = "bottom" }: { orientation?: "bottom" | "s
       aria-label="Primary"
       className={
         side
-          ? "flex flex-1 flex-col px-3 py-4"
-          : "fixed inset-x-0 bottom-0 z-40 border-t border-forest-ink/10 bg-paper md:hidden"
+          ? "flex flex-1 flex-col px-3 py-2"
+          : "fixed inset-x-0 bottom-0 z-40 border-t border-forest-ink/10 bg-white md:hidden"
       }
       style={side ? undefined : { paddingBottom: "env(safe-area-inset-bottom)" }}
     >
@@ -65,20 +72,28 @@ export function TabNav({ orientation = "bottom" }: { orientation?: "bottom" | "s
             <li key={tab.href}>
               <Link
                 href={tab.href}
+                aria-current={active ? "page" : undefined}
                 className={
                   side
-                    ? `flex min-h-11 items-center gap-3 px-3 text-sm ${
-                        active ? "bg-warm-cream font-semibold text-forest-ink" : "text-forest-ink/70 hover:bg-warm-cream/50"
+                    ? `flex min-h-12 items-center gap-3 rounded-xl px-3 text-sm font-medium ${
+                        active ? "bg-sage text-forest-ink" : "text-ink-soft hover:bg-sage/60"
                       }`
-                    : `flex min-h-14 flex-col items-center justify-center gap-0.5 text-[11px] tracking-wide ${
-                        active ? "text-forest-ink" : "text-forest-ink/45"
+                    : `flex min-h-16 flex-col items-center justify-center gap-1 text-[14px] font-medium ${
+                        active ? "text-action-green" : "text-ink-soft"
                       }`
                 }
-                aria-current={active ? "page" : undefined}
               >
-                <TabIcon href={tab.href} />
-                {tab.label}
-                {!side && active ? <span className="h-px w-4 bg-action-green" aria-hidden /> : null}
+                <span
+                  className={
+                    side
+                      ? ""
+                      : `flex h-8 w-8 items-center justify-center rounded-full ${active ? "bg-sage text-action-green" : ""}`
+                  }
+                >
+                  <TabIcon href={tab.href} />
+                </span>
+                <span>{tab.label}</span>
+                <span className="sr-only">{tab.hint}</span>
               </Link>
             </li>
           );

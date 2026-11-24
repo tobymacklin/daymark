@@ -31,7 +31,7 @@ function LandingShell() {
       />
       <header className="relative mx-auto flex w-full max-w-5xl items-center justify-between px-5 py-6 sm:px-8">
         <div className="flex items-center gap-2">
-          <DaymarkMark className="h-7 w-7 text-action-green" />
+          <DaymarkMark className="h-9 w-9" title="" />
           <DaymarkWordmark className="text-2xl" />
         </div>
         <Link href="/onboarding" className="text-sm font-medium text-forest-ink/75 hover:text-forest-ink">

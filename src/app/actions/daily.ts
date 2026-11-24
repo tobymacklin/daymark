@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/authentication/current-user";
 import { getDb } from "@/lib/database";
+import { composeMemoryNote, promptsFor } from "@/features/daily/memory-prompts";
 import { completeToday, type CompletionMethod } from "@/features/daily/service";
 import { NOTE_MAX_LENGTH, updateMemoryNote } from "@/features/memories/service";
 
@@ -23,9 +24,6 @@ export async function completeDailyExperience(
     return { error: "Choose a valid experience." };
   }
 
-  const noteRaw = String(formData.get("note") ?? "");
-  const note = noteRaw.trim() ? noteRaw.trim().slice(0, NOTE_MAX_LENGTH) : null;
-
   const result = await completeToday(await getDb(), user, method, new Date());
   if (!result.ok) {
     return {
@@ -36,6 +34,12 @@ export async function completeDailyExperience(
     };
   }
 
+  const prompts = promptsFor(result.slug);
+  const note = composeMemoryNote(
+    prompts,
+    formData.getAll("detailLabel").map(String),
+    formData.getAll("detailValue").map(String),
+  )?.slice(0, NOTE_MAX_LENGTH);
   if (note) {
     await updateMemoryNote(await getDb(), user.id, result.memoryId, note);
   }

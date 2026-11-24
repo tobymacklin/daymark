@@ -17,7 +17,7 @@ export default async function OnboardingPage() {
     <div className="flex min-h-full flex-col bg-paper px-5 py-8 text-forest-ink sm:px-8">
       <div className="mx-auto w-full max-w-lg">
         <Link href="/" className="inline-flex items-center gap-2">
-          <DaymarkMark className="h-7 w-7 text-action-green" />
+          <DaymarkMark className="h-9 w-9" title="" />
           <DaymarkWordmark className="text-2xl" />
         </Link>
         <h1 className="mt-10 font-display text-4xl leading-tight">

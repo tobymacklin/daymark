@@ -4,12 +4,15 @@ import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/authentication/current-user";
 import { getDb } from "@/lib/database";
 import { localDateInTimezone } from "@/lib/dates";
-import { unlockAchievement } from "@/features/achievements/service";
+import { getCollection, unlockAchievement } from "@/features/achievements/service";
 
 export type UnlockState = {
   error?: string;
   xpAwarded?: number;
   masteryXpAwarded?: number;
+  created?: boolean;
+  unlocked?: number;
+  total?: number;
 };
 
 export async function unlockSelfReportedAchievement(
@@ -43,8 +46,21 @@ export async function unlockSelfReportedAchievement(
   revalidatePath("/profile");
   revalidatePath("/today");
 
+  let unlocked: number | undefined;
+  let total: number | undefined;
+  if (collectionSlug && result.created) {
+    const collection = await getCollection(await getDb(), user.id, collectionSlug);
+    if (collection) {
+      unlocked = collection.unlocked;
+      total = collection.total;
+    }
+  }
+
   return {
     xpAwarded: result.xpAwarded,
     masteryXpAwarded: result.masteryXpAwarded,
+    created: result.created,
+    unlocked,
+    total,
   };
 }

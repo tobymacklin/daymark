@@ -95,6 +95,27 @@ export function formatStamp(date: LocalDate): string {
   return `${weekday} ${dayOfMonth(date)} ${month}`.toUpperCase();
 }
 
+/** Hour 0–23 in a timezone. */
+export function hourInTimezone(now: Date, timezone: string): number {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: timezone,
+    hour: "numeric",
+    hourCycle: "h23",
+  }).formatToParts(now);
+  return Number(parts.find((part) => part.type === "hour")?.value ?? 0);
+}
+
+export function greetingForHour(hour: number): string {
+  if (hour < 12) return "Good morning.";
+  if (hour < 17) return "Good afternoon.";
+  return "Good evening.";
+}
+
+/** "Monday, November 23" */
+export function formatWeekdayDate(date: LocalDate): string {
+  return `${weekdayName(date)}, ${monthName(date)} ${dayOfMonth(date)}`;
+}
+
 /** "Monday 23 November 2026" */
 export function formatLong(date: LocalDate): string {
   return `${weekdayName(date)} ${dayOfMonth(date)} ${monthName(date)} ${date.slice(0, 4)}`;
