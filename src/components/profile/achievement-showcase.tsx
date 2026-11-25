@@ -44,8 +44,10 @@ export function AchievementShowcase({ items }: { items: ShowcaseItem[] }) {
                 href={`/achieve/${item.collectionSlug}/${item.slug}`}
                 className="flex min-h-12 flex-col items-center text-center"
               >
-                <PinImage src={item.art} title={item.title} size="profile" earned />
-                <span className="mt-2 block text-[0.8125rem] leading-4 font-medium">{item.title}</span>
+                <PinImage src={item.art} title={item.title} size="profile" earned rarity={item.rarity} />
+                <span className="mt-2 flex h-8 w-full items-start justify-center text-center text-[0.8125rem] leading-4 font-medium">
+                  <span className="line-clamp-2">{item.title}</span>
+                </span>
                 <span className="mt-0.5 block text-[0.75rem] text-ink-soft">{RARITY_LABEL[item.rarity]}</span>
               </Link>
             </li>

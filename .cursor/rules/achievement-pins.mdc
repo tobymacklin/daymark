@@ -1,0 +1,12 @@
+---
+description: Soft-enamel achievement pin art direction. Use when creating or revising Daymark achievement artwork.
+alwaysApply: true
+---
+
+# Achievement pin art
+
+Bronze pins share one formula: a warm copper circle, one flat enamel field, one centered symbol, three short cream rays above, and one small two-leaf sprig below. Silver, gold, platinum, and legendary keep their existing frames. Each pin keeps its own enamel color.
+
+- The symbol is one recognizable enamel shape. A shadow is a large, dark, high-contrast shape of that object, attached to it. Do not add a horizon, sky, or ground.
+- Generate on a plain white background with no text, then knock out the background before saving `public/achievements/{slug}.png`.
+- Do not regenerate pins the user has already approved.

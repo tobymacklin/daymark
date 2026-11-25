@@ -1,6 +1,7 @@
 import { MASTERY_XP, type Rarity } from "../../../supabase/seed/collections";
 import type { LocalDate } from "@/lib/dates";
 import type { Db } from "@/lib/database/types";
+import { NOTE_MAX_LENGTH } from "@/features/memories/service";
 import { awardXp } from "@/features/progression/service";
 
 export type { Rarity };
@@ -221,6 +222,8 @@ export type UnlockResult =
       xpAwarded: number;
       /** Mastery XP, when this unlock completed the collection. */
       masteryXpAwarded: number;
+      /** The journal entry created with this unlock. */
+      memoryId: string | null;
     }
   | { ok: false; reason: "not_found" | "prerequisites" };
 
@@ -231,7 +234,7 @@ export type UnlockResult =
  */
 export async function unlockAchievement(
   db: Db,
-  input: { userId: string; achievementId: string; today: LocalDate; now?: Date },
+  input: { userId: string; achievementId: string; today: LocalDate; now?: Date; note?: string | null },
 ): Promise<UnlockResult> {
   return db.transaction(async (tx): Promise<UnlockResult> => {
     const [achievement] = await tx.query<{
@@ -265,12 +268,14 @@ export async function unlockAchievement(
        returning id`,
       [input.userId, achievement.id, input.now ?? new Date()],
     );
-    if (!unlock) return { ok: true, created: false, xpAwarded: 0, masteryXpAwarded: 0 };
+    if (!unlock) return { ok: true, created: false, xpAwarded: 0, masteryXpAwarded: 0, memoryId: null };
 
-    await tx.query(
-      `insert into memory_entries (user_id, source_type, source_id, title, occurred_on)
-       values ($1, 'achievement', $2, $3, $4::date)`,
-      [input.userId, unlock.id, achievement.title, input.today],
+    const note = input.note?.trim() ? input.note.trim().slice(0, NOTE_MAX_LENGTH) : null;
+    const [memory] = await tx.query<{ id: string }>(
+      `insert into memory_entries (user_id, source_type, source_id, title, occurred_on, note)
+       values ($1, 'achievement', $2, $3, $4::date, $5)
+       returning id`,
+      [input.userId, unlock.id, achievement.title, input.today, note],
     );
 
     const xpAwarded = await awardXp(tx, {
@@ -299,6 +304,6 @@ export async function unlockAchievement(
           })
         : 0;
 
-    return { ok: true, created: true, xpAwarded, masteryXpAwarded };
+    return { ok: true, created: true, xpAwarded, masteryXpAwarded, memoryId: memory.id };
   });
 }

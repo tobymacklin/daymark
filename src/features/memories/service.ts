@@ -182,3 +182,18 @@ export async function updateMemory(
   );
   return rows.length > 0;
 }
+
+export async function setMemoryImage(
+  db: Db,
+  userId: string,
+  memoryId: string,
+  imagePath: string,
+): Promise<boolean> {
+  const rows = await db.query(
+    `update memory_entries set image_path = $3, updated_at = now()
+     where id = $1 and user_id = $2
+     returning id`,
+    [memoryId, userId, imagePath],
+  );
+  return rows.length > 0;
+}

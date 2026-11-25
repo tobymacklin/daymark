@@ -1,9 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
 import { unlockSelfReportedAchievement, type UnlockState } from "@/app/actions/achievements";
 import { PinImage } from "@/components/achievements/pin-image";
 import { Button } from "@/components/ui/button";
+import { NOTE_MAX_LENGTH } from "@/features/memories/service";
+import type { Rarity } from "../../../supabase/seed/collections";
 
 type UnlockFormProps = {
   achievementId: string;
@@ -12,6 +15,7 @@ type UnlockFormProps = {
   disabledReason?: string;
   artworkSrc: string | null;
   title: string;
+  rarity?: Rarity;
   rarityLabel: string;
   xp: number;
   collectionLabel: string;
@@ -26,6 +30,7 @@ export function UnlockForm({
   disabledReason,
   artworkSrc,
   title,
+  rarity,
   rarityLabel,
   xp,
   collectionLabel,
@@ -46,7 +51,7 @@ export function UnlockForm({
         <p className="text-[0.875rem] font-semibold tracking-wide text-action-green">Achievement earned</p>
         <div className="mt-3 flex items-center gap-4">
           <span className="check-pop">
-            <PinImage src={artworkSrc} title={title} size="gallery" earned />
+            <PinImage src={artworkSrc} title={title} size="gallery" earned rarity={rarity} />
           </span>
           <div>
             <h2 className="font-display text-[1.35rem] font-semibold leading-tight">{title}</h2>
@@ -60,11 +65,27 @@ export function UnlockForm({
             ) : null}
             {state.masteryXpAwarded ? (
               <p className="mt-1 text-[0.9375rem] font-medium text-action-green">
-                Collection completed · +{state.masteryXpAwarded} XP
+                <Link href={`/achieve/${collectionSlug}/mastery`} className="underline underline-offset-4">
+                  {collectionLabel} Mastery
+                </Link>{" "}
+                earned
+                <span className="whitespace-nowrap"> · +{state.masteryXpAwarded} XP</span>
               </p>
             ) : null}
           </div>
         </div>
+        {state.photoSaved && state.memoryId ? (
+          <img
+            src={`/media/memory/${state.memoryId}`}
+            alt={`Your photo for ${title}`}
+            className="mt-4 aspect-video max-h-64 w-full rounded-2xl object-cover"
+          />
+        ) : null}
+        {state.error ? (
+          <p className="mt-3 text-[0.9375rem] text-danger" role="alert">
+            {state.error}
+          </p>
+        ) : null}
       </section>
     );
   }
@@ -73,19 +94,42 @@ export function UnlockForm({
     <form action={action} className="space-y-3">
       <input type="hidden" name="achievementId" value={achievementId} />
       <input type="hidden" name="collectionSlug" value={collectionSlug} />
+      <label className="block space-y-1">
+        <span className="text-[0.9375rem] font-medium">
+          Note <span className="font-normal text-ink-soft">optional</span>
+        </span>
+        <textarea
+          name="note"
+          rows={3}
+          maxLength={NOTE_MAX_LENGTH}
+          className="w-full rounded-xl border border-forest-ink/15 bg-white px-3 py-2 text-[1.0625rem] leading-7 outline-none focus-visible:ring-2 focus-visible:ring-action-green"
+        />
+      </label>
+      <label className="block space-y-1">
+        <span className="text-[0.9375rem] font-medium">
+          Photo <span className="font-normal text-ink-soft">optional</span>
+        </span>
+        <input
+          name="photo"
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          className="block w-full text-[0.9375rem] file:mr-3 file:min-h-12 file:rounded-xl file:border-0 file:bg-sage file:px-4 file:font-semibold file:text-action-green"
+        />
+      </label>
+      <p className="text-[0.9375rem] leading-6 text-ink-soft">
+        A photo and a note can support the accomplishment. Neither is required.
+      </p>
       <Button type="submit" disabled={pending} className="w-full sm:w-auto">
         {pending ? "Saving…" : "Mark complete"}
       </Button>
-      <p className="text-[0.9375rem] leading-6 text-ink-soft">
-        A photo is optional. It can support the accomplishment, and it is not required.
-      </p>
       {state.error ? (
         <p className="text-[0.9375rem] text-danger" role="alert">
           {state.error}
         </p>
       ) : null}
       <p className="text-[0.875rem] text-ink-soft">
-        {rarityLabel} · {xp} XP
+        {rarityLabel}
+        <span className="whitespace-nowrap tabular"> · {xp} XP</span>
       </p>
     </form>
   );

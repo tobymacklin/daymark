@@ -18,6 +18,8 @@ export const RARITY_LABEL: Record<Rarity, string> = {
   legendary: "Legendary",
 };
 
+export const RARITY_ORDER: Rarity[] = ["bronze", "silver", "gold", "platinum", "legendary"];
+
 export const RARITY_COLOR: Record<Rarity, string> = {
   bronze: "var(--rarity-bronze)",
   silver: "var(--rarity-silver)",

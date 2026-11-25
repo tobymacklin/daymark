@@ -1,25 +1,16 @@
 "use server";
 
-import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
 import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/authentication/current-user";
 import { getDb } from "@/lib/database";
 import { isLocalDate, localDateInTimezone } from "@/lib/dates";
-import { mediaRoot, memoryImageRelative } from "@/lib/media";
+import { photoFile, photoProblem, writeMemoryPhoto } from "@/lib/memory-photo";
 import { NOTE_MAX_LENGTH, updateMemory } from "@/features/memories/service";
 
 export type MemoryEditState = {
   error?: string;
   saved?: boolean;
 };
-
-function extensionFor(type: string): "jpg" | "png" | "webp" | null {
-  if (type === "image/jpeg") return "jpg";
-  if (type === "image/png") return "png";
-  if (type === "image/webp") return "webp";
-  return null;
-}
 
 export async function updatePersonalMemory(
   _prev: MemoryEditState,
@@ -38,19 +29,15 @@ export async function updatePersonalMemory(
   if (date > today) return { error: "Choose today or an earlier date." };
 
   let imagePath: string | undefined;
-  const file = formData.get("photo");
-  if (file instanceof File && file.size > 0) {
-    if (file.size > 4_000_000) return { error: "Choose a photo under 4 MB." };
-    const ext = extensionFor(file.type);
-    if (!ext) return { error: "Use a JPEG, PNG, or WebP photo." };
+  const photo = photoFile(formData.get("photo"));
+  if (photo) {
+    const problem = photoProblem(photo);
+    if (problem) return { error: problem };
     try {
-      imagePath = memoryImageRelative(user.id, memoryId, ext);
+      imagePath = await writeMemoryPhoto(user.id, memoryId, photo);
     } catch {
-      return { error: "That memory could not be updated." };
+      return { error: "That photo could not be saved." };
     }
-    const dest = path.join(mediaRoot(), imagePath);
-    await mkdir(path.dirname(dest), { recursive: true });
-    await writeFile(dest, Buffer.from(await file.arrayBuffer()));
   }
 
   const saved = await updateMemory(await getDb(), user.id, memoryId, {
@@ -64,5 +51,6 @@ export async function updatePersonalMemory(
   revalidatePath("/today");
   revalidatePath("/memories");
   revalidatePath("/profile");
+  revalidatePath("/achieve", "layout");
   return { saved: true };
 }

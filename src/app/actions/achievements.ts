@@ -4,7 +4,9 @@ import { revalidatePath } from "next/cache";
 import { requireUser } from "@/lib/authentication/current-user";
 import { getDb } from "@/lib/database";
 import { localDateInTimezone } from "@/lib/dates";
+import { photoFile, photoProblem, writeMemoryPhoto } from "@/lib/memory-photo";
 import { getCollection, unlockAchievement } from "@/features/achievements/service";
+import { NOTE_MAX_LENGTH, setMemoryImage } from "@/features/memories/service";
 
 export type UnlockState = {
   error?: string;
@@ -13,6 +15,8 @@ export type UnlockState = {
   created?: boolean;
   unlocked?: number;
   total?: number;
+  memoryId?: string;
+  photoSaved?: boolean;
 };
 
 export async function unlockSelfReportedAchievement(
@@ -24,11 +28,20 @@ export async function unlockSelfReportedAchievement(
   const collectionSlug = String(formData.get("collectionSlug") ?? "");
   if (!achievementId) return { error: "Missing achievement." };
 
+  const noteRaw = String(formData.get("note") ?? "");
+  const note = noteRaw.trim() ? noteRaw.trim().slice(0, NOTE_MAX_LENGTH) : null;
+  const photo = photoFile(formData.get("photo"));
+  if (photo) {
+    const problem = photoProblem(photo);
+    if (problem) return { error: problem };
+  }
+
   const today = localDateInTimezone(new Date(), user.timezone);
   const result = await unlockAchievement(await getDb(), {
     userId: user.id,
     achievementId,
     today,
+    note,
   });
 
   if (!result.ok) {
@@ -40,8 +53,19 @@ export async function unlockSelfReportedAchievement(
     };
   }
 
-  revalidatePath("/achieve");
-  if (collectionSlug) revalidatePath(`/achieve/${collectionSlug}`);
+  let photoSaved = false;
+  let photoError: string | undefined;
+  if (result.created && result.memoryId && photo) {
+    try {
+      const imagePath = await writeMemoryPhoto(user.id, result.memoryId, photo);
+      photoSaved = await setMemoryImage(await getDb(), user.id, result.memoryId, imagePath);
+      if (!photoSaved) photoError = "The achievement was saved, but the photo could not be attached.";
+    } catch {
+      photoError = "The achievement was saved, but the photo could not be attached.";
+    }
+  }
+
+  revalidatePath("/achieve", "layout");
   revalidatePath("/memories");
   revalidatePath("/profile");
   revalidatePath("/today");
@@ -57,10 +81,13 @@ export async function unlockSelfReportedAchievement(
   }
 
   return {
+    error: photoError,
     xpAwarded: result.xpAwarded,
     masteryXpAwarded: result.masteryXpAwarded,
     created: result.created,
     unlocked,
     total,
+    memoryId: result.memoryId ?? undefined,
+    photoSaved,
   };
 }

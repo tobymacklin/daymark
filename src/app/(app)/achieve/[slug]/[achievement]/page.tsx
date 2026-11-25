@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AchievementArtwork } from "@/components/achievements/achievement-artwork";
+import { AchievementPhotoForm } from "@/components/achievements/achievement-photo-form";
 import { UnlockForm } from "@/components/achievements/unlock-form";
+import { MemoryNote } from "@/components/memories/memory-note";
 import { getCollection } from "@/features/achievements/service";
+import { getMemory } from "@/features/memories/service";
 import { requireUser } from "@/lib/authentication/current-user";
 import { achievementArtSrc } from "@/lib/achievement-art";
 import { hobbyName } from "@/lib/artwork";
@@ -19,13 +22,18 @@ type AchievementPageProps = {
 export default async function AchievementDetailPage({ params }: AchievementPageProps) {
   const { slug, achievement: achievementSlug } = await params;
   const user = await requireUser();
-  const collection = await getCollection(await getDb(), user.id, slug);
+  const db = await getDb();
+  const collection = await getCollection(db, user.id, slug);
   if (!collection) notFound();
 
   const achievement = collection.achievements.find((item) => item.slug === achievementSlug);
   if (!achievement) notFound();
 
   const label = hobbyName(collection.slug, collection.name);
+  const memory =
+    achievement.state === "unlocked" && achievement.memoryId
+      ? await getMemory(db, user.id, achievement.memoryId)
+      : null;
   const lockedReason =
     achievement.state === "locked"
       ? `This comes after ${achievement.prerequisites
@@ -49,6 +57,7 @@ export default async function AchievementDetailPage({ params }: AchievementPageP
           title={achievement.title}
           size="detail"
           earned={achievement.state === "unlocked"}
+          rarity={achievement.rarity}
         />
         <div>
           <p className="text-[0.875rem] text-ink-soft">{label}</p>
@@ -56,7 +65,8 @@ export default async function AchievementDetailPage({ params }: AchievementPageP
             {achievement.title}
           </h1>
           <p className="mt-1 text-[1rem] font-medium text-ink-soft">
-            {RARITY_LABEL[achievement.rarity]} · {achievement.xp} XP
+            {RARITY_LABEL[achievement.rarity]}
+            <span className="whitespace-nowrap tabular"> · {achievement.xp} XP</span>
           </p>
           <p className="mt-2 text-[1.0625rem] leading-7">{achievement.description}</p>
         </div>
@@ -101,13 +111,31 @@ export default async function AchievementDetailPage({ params }: AchievementPageP
 
       <div className="mt-5">
         {achievement.state === "unlocked" ? (
-          <p className="text-[1.0625rem] text-action-green">
-            Completed
-            {achievement.unlockedAt
-              ? ` on ${formatMedium(localDateInTimezone(new Date(achievement.unlockedAt), user.timezone))}`
-              : ""}
-            .
-          </p>
+          <div className="space-y-4">
+            {memory?.imagePath ? (
+              <img
+                src={`/media/memory/${memory.id}`}
+                alt={`Your photo for ${achievement.title}`}
+                className="aspect-video max-h-80 w-full rounded-2xl object-cover"
+              />
+            ) : null}
+            {memory?.note ? <MemoryNote note={memory.note} /> : null}
+            <p className="text-[1.0625rem] text-action-green">
+              Completed
+              {achievement.unlockedAt
+                ? ` on ${formatMedium(localDateInTimezone(new Date(achievement.unlockedAt), user.timezone))}`
+                : ""}
+              .
+            </p>
+            {memory && !memory.imagePath ? (
+              <AchievementPhotoForm
+                memoryId={memory.id}
+                title={memory.title.replace(/\.$/, "")}
+                date={memory.date}
+                note={memory.note ?? ""}
+              />
+            ) : null}
+          </div>
         ) : (
           <UnlockForm
             achievementId={achievement.id}
@@ -116,6 +144,7 @@ export default async function AchievementDetailPage({ params }: AchievementPageP
             disabledReason={lockedReason}
             artworkSrc={achievementArtSrc(achievement.slug)}
             title={achievement.title}
+            rarity={achievement.rarity}
             rarityLabel={RARITY_LABEL[achievement.rarity]}
             xp={achievement.xp}
             collectionLabel={label}

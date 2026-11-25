@@ -24,24 +24,15 @@ export default async function MemoriesPage() {
   return (
     <div>
       <h1 className="font-display text-[1.75rem] font-semibold tracking-tight">Memories</h1>
-      <p className="mt-1 text-[1.0625rem] text-ink-soft">The moments that make up your life.</p>
-
-      <section className="mt-4 rounded-2xl bg-sage px-4 py-4">
-        <h2 className="font-display text-[1.25rem] font-semibold">
-          {dueCount > 0 ? "Remember last week?" : "Look back on a moment"}
-        </h2>
-        <p className="mt-1 text-[1.0625rem] leading-7">
-          {dueCount > 0
-            ? "Take a moment to revisit your experiences."
-            : "Nothing is waiting right now. You can still open recall whenever you like."}
-        </p>
-        <Link
-          href="/memories/recall"
-          className="mt-3 flex min-h-12 items-center justify-center rounded-xl bg-action-green px-4 text-[1.0625rem] font-semibold text-white"
-        >
-          Start memory recall
+      <p className="mt-1 text-[1.0625rem] leading-7 text-ink-soft">
+        A private journal of moments from Today and achievements you complete.
+      </p>
+      <p className="mt-3 text-[1.0625rem] leading-7">
+        {dueCount > 0 ? "A moment from last week is ready to revisit." : "Nothing is waiting to revisit."}{" "}
+        <Link href="/memories/recall" className="font-semibold text-action-green underline-offset-4 hover:underline">
+          {dueCount > 0 ? "Start recall" : "Open recall"}
         </Link>
-      </section>
+      </p>
 
       <div className="mt-6 flex items-baseline justify-between">
         <h2 className="font-display text-[1.35rem] font-semibold">{formatMonth(month)}</h2>

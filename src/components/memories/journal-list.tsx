@@ -23,7 +23,7 @@ export function JournalList({ memories }: { memories: Memory[] }) {
   if (groups.length === 0) {
     return (
       <p className="mt-4 text-[1.0625rem] leading-7 text-ink-soft">
-        Your journal starts when you keep today’s experience. Anything you write here stays private.
+        Your journal starts when you keep today’s experience or complete an achievement. Anything you write here stays private.
       </p>
     );
   }
@@ -57,16 +57,22 @@ export function JournalList({ memories }: { memories: Memory[] }) {
   );
 }
 
+function MemoryPhoto({ memory }: { memory: Memory }) {
+  if (!memory.imagePath) return null;
+  return (
+    <img
+      src={`/media/memory/${memory.id}`}
+      alt={`Your photo for ${memory.title.replace(/\.$/, "")}`}
+      className="mt-2 aspect-video max-h-64 w-full rounded-2xl object-cover"
+    />
+  );
+}
+
 function Moment({ memory }: { memory: Memory }) {
   return (
     <article>
-      {memory.imagePath ? (
-        <img
-          src={`/media/memory/${memory.id}`}
-          alt="Your photo"
-          className="aspect-video max-h-64 w-full rounded-2xl object-cover"
-        />
-      ) : null}
+      <p className="text-[0.8125rem] font-medium tracking-wide text-ink-soft">MOMENT</p>
+      <MemoryPhoto memory={memory} />
       <MemoryBody memory={memory} prominent />
     </article>
   );
@@ -74,14 +80,19 @@ function Moment({ memory }: { memory: Memory }) {
 
 function Record({ memory }: { memory: Memory }) {
   if (memory.source.type !== "achievement") return null;
+  const hobby = memory.source.collectionName
+    ? hobbyName(memory.source.collectionSlug, memory.source.collectionName)
+    : "Achievement";
   return (
-    <li className="py-2">
+    <li className="py-3">
+      <p className="text-[0.8125rem] font-medium tracking-wide text-ink-soft">{hobby.toUpperCase()} ACHIEVEMENT</p>
+      <MemoryPhoto memory={memory} />
       <MemoryBody memory={memory} prominent={false} />
       <Link
         href={`/achieve/${memory.source.collectionSlug}/${memory.source.achievementSlug}`}
         className="mt-1 inline-flex min-h-12 items-center text-[0.9375rem] text-action-green underline-offset-4 hover:underline"
       >
-        {memory.source.collectionName ? hobbyName(memory.source.collectionSlug, memory.source.collectionName) : "Achievement"} achievement
+        Open achievement
       </Link>
     </li>
   );

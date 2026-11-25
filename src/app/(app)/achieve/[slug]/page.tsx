@@ -21,7 +21,6 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
 
   const label = hobbyName(collection.slug, collection.name);
   const image = hobbyImage(collection.slug);
-  const complete = collection.unlocked >= collection.total && collection.total > 0;
 
   return (
     <div>
@@ -38,13 +37,17 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
 
       <h1 className="mt-4 font-display text-[1.75rem] font-semibold tracking-tight">{label}</h1>
       <p className="mt-1 text-[1.0625rem] leading-7 text-ink-soft">{collection.tagline}</p>
-      <p className="mt-2 text-[0.9375rem] text-ink-soft">
-        {collection.unlocked} of {collection.total} achievements
-        {complete ? " · Collection completed" : ""}
-      </p>
 
       <AchievementBoard
         collectionSlug={collection.slug}
+        unlocked={collection.unlocked}
+        total={collection.total}
+        mastery={{
+          title: `${label} Mastery`,
+          xp: collection.masteryXp,
+          earned: collection.mastered,
+          theme: collection.theme,
+        }}
         items={collection.achievements.map((achievement) => ({
           slug: achievement.slug,
           title: achievement.title,
