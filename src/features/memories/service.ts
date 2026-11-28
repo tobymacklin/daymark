@@ -183,6 +183,15 @@ export async function updateMemory(
   return rows.length > 0;
 }
 
+export async function listMemoryImagePaths(db: Db, userId: string): Promise<string[]> {
+  const rows = await db.query<{ image_path: string }>(
+    `select image_path from memory_entries
+     where user_id = $1 and image_path is not null`,
+    [userId],
+  );
+  return rows.map((row) => row.image_path);
+}
+
 export async function setMemoryImage(
   db: Db,
   userId: string,

@@ -57,9 +57,7 @@ function LandingShell() {
           >
             Start today
           </Link>
-          <p className="text-sm text-forest-ink/60">
-            No account email yet · progress stays on this device
-          </p>
+          <p className="text-sm text-forest-ink/60">An email and a password keep your progress with you.</p>
         </div>
 
         <section className="mt-16 grid gap-4 sm:grid-cols-3">

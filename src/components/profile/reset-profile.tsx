@@ -16,7 +16,7 @@ export function ResetProfile() {
           onChange={(event) => setConfirmed(event.target.checked)}
           className="mt-1.5 h-5 w-5 accent-[#294F40]"
         />
-        <span>I understand this deletes my local profile, memories, and progress on this device.</span>
+        <span>I understand this deletes my profile, memories, and progress.</span>
       </label>
       <Button type="submit" variant="danger" disabled={!confirmed}>
         Reset local profile

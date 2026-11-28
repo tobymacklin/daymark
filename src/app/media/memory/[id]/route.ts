@@ -1,7 +1,6 @@
-import { readFile } from "node:fs/promises";
 import { getCurrentUser } from "@/lib/authentication/current-user";
 import { getDb } from "@/lib/database";
-import { contentTypeFor, resolveMemoryImage } from "@/lib/media";
+import { readMemoryPhoto } from "@/lib/memory-photo";
 import { getMemory } from "@/features/memories/service";
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -14,18 +13,13 @@ export async function GET(_request: Request, context: RouteContext) {
   const memory = await getMemory(await getDb(), user.id, id);
   if (!memory?.imagePath) return new Response("Not found.", { status: 404 });
 
-  const file = resolveMemoryImage(memory.imagePath);
-  if (!file) return new Response("Not found.", { status: 404 });
+  const photo = await readMemoryPhoto(memory.imagePath);
+  if (!photo) return new Response("Not found.", { status: 404 });
 
-  try {
-    const bytes = await readFile(file);
-    return new Response(bytes, {
-      headers: {
-        "Content-Type": contentTypeFor(memory.imagePath),
-        "Cache-Control": "private, max-age=3600",
-      },
-    });
-  } catch {
-    return new Response("Not found.", { status: 404 });
-  }
+  return new Response(Buffer.from(photo.bytes), {
+    headers: {
+      "Content-Type": photo.contentType,
+      "Cache-Control": "private, max-age=3600",
+    },
+  });
 }

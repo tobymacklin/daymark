@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { signOut } from "@/app/actions/auth";
 import { AchievementShowcase } from "@/components/profile/achievement-showcase";
 import { RankEmblem } from "@/components/progression/rank-emblem";
 import { listCollections, listRecentUnlocks } from "@/features/achievements/service";
@@ -45,6 +46,15 @@ export default async function ProfilePage() {
           </span>
           <h1 className="font-display text-[1.65rem] font-semibold leading-tight tracking-tight">Your journey</h1>
         </div>
+        <div className="flex items-center gap-1">
+          <form action={signOut}>
+            <button
+              type="submit"
+              className="inline-flex min-h-12 items-center px-3 text-[1rem] font-semibold text-ink-soft"
+            >
+              Sign out
+            </button>
+          </form>
         <Link
           href="/profile/settings"
           aria-label="Settings"
@@ -58,8 +68,17 @@ export default async function ProfilePage() {
             />
           </svg>
         </Link>
+        </div>
       </div>
       <p className="mt-2 text-[0.9375rem] text-ink-soft">Exploring life since {formatMonth(yearMonthOf(joinedOn))}</p>
+      {user.emailAccount ? null : (
+        <p className="mt-3 text-[1.0625rem] leading-7">
+          <Link href="/profile/settings" className="font-medium text-action-green underline-offset-4 hover:underline">
+            Add an email and password
+          </Link>{" "}
+          so this profile can be opened on another device.
+        </p>
+      )}
 
       <section className="mt-4 rounded-2xl bg-action-green px-4 py-4 text-white">
         <div className="flex items-start justify-between gap-3">
